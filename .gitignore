@@ -1,0 +1,23 @@
+# Model files (too large for GitHub)
+artifacts/model.pth
+*.pth
+*.h5
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Dataset (too large)
+Project102/Dataset/
+
+# Logs
+*.log
+Project102/logs/
+
