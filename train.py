@@ -262,8 +262,9 @@ def evaluate(model, loader, criterion, device) -> Tuple[float, float]:
 
 def main():
 
-	parser = argparse.ArgumentParser(description="Train skin defects classifier")
-	parser.add_argument("--data_dir", default="Project102/Dataset/train", type=str, help="Path to folder-based dataset (class subfolders)")
+	parser = argparse.ArgumentParser(description="Train skin disease classifier (10 classes)")
+	parser.add_argument("--data_dir", default="Project102/Dataset/train", type=str, help="Path to training folder (class subfolders)")
+	parser.add_argument("--test_dir", default="Project102/Dataset/test", type=str, help="Path to test folder for final evaluation")
 	parser.add_argument("--csv", default=None, type=str, help="Path to CSV metadata (optional, overrides --data_dir)")
 	parser.add_argument("--files_root", default="files", type=str, help="Root folder for CSV-based images")
 	parser.add_argument("--epochs", default=30, type=int)
@@ -390,6 +391,64 @@ def main():
 				break
 
 	print(f"Model saved to {model_path}")
+	
+	# Final evaluation on test set
+	if args.test_dir and os.path.isdir(args.test_dir):
+		print("\n" + "="*50)
+		print("Evaluating on TEST SET...")
+		print("="*50)
+		
+		test_items, test_class_names = load_folder_dataset(args.test_dir)
+		# Filter test items to only include classes we trained on
+		test_items = [(path, label, group) for path, label, group in test_items if label in class_to_idx]
+		
+		if len(test_items) > 0:
+			test_tfms = transforms.Compose([
+				transforms.Resize((args.image_size, args.image_size)),
+				transforms.ToTensor(),
+				transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+			])
+			
+			test_encoded = [(path, class_to_idx[label]) for path, label, _ in test_items]
+			test_ds = SkinDefectsImageDataset(test_encoded, test_tfms)
+			test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False, num_workers=0)
+			
+			# Load best model for test evaluation
+			best_ckpt = torch.load(model_path, map_location=device)
+			model.load_state_dict(best_ckpt["model_state_dict"])
+			
+			test_loss, test_acc = evaluate(model, test_loader, criterion, device)
+			print(f"Test Loss: {test_loss:.4f}")
+			print(f"Test Accuracy: {test_acc:.4f} ({test_acc*100:.2f}%)")
+			print(f"Test samples: {len(test_items)}")
+			
+			# Per-class accuracy
+			model.eval()
+			class_correct = {name: 0 for name in class_names}
+			class_total = {name: 0 for name in class_names}
+			idx_to_class = {v: k for k, v in class_to_idx.items()}
+			
+			with torch.no_grad():
+				for images, labels in test_loader:
+					images = images.to(device)
+					labels = labels.to(device)
+					outputs = model(images)
+					_, preds = torch.max(outputs, 1)
+					
+					for label, pred in zip(labels.cpu().numpy(), preds.cpu().numpy()):
+						class_name = idx_to_class[label]
+						class_total[class_name] += 1
+						if label == pred:
+							class_correct[class_name] += 1
+			
+			print("\nPer-class Test Accuracy:")
+			print("-" * 60)
+			for name in class_names:
+				if class_total[name] > 0:
+					acc = class_correct[name] / class_total[name]
+					print(f"  {name[:50]:50s}: {acc:.2%} ({class_correct[name]}/{class_total[name]})")
+		else:
+			print("No test samples found matching training classes.")
 
 
 if __name__ == "__main__":

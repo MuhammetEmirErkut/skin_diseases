@@ -29,6 +29,10 @@ def load_checkpoint(checkpoint_path: str):
 		model = models.efficientnet_b0(weights=None)
 		in_features = model.classifier[-1].in_features
 		model.classifier[-1] = nn.Linear(in_features, len(class_to_idx))
+	elif arch == "convnext_tiny":
+		model = models.convnext_tiny(weights=None)
+		in_features = model.classifier[-1].in_features
+		model.classifier[-1] = nn.Linear(in_features, len(class_to_idx))
 	else:
 		raise ValueError(f"Unknown arch in checkpoint: {arch}")
 	model.load_state_dict(ckpt["model_state_dict"])
@@ -100,8 +104,8 @@ class SkinGUI:
 		self.pred_label = tk.Label(right_frame, textvariable=self.pred_label_var, font=("Arial", 14))
 		self.pred_label.pack(anchor=tk.W, pady=8)
 
-		self.prob_text = tk.Text(right_frame, height=8)
-		self.prob_text.pack(fill=tk.X)
+		self.prob_text = tk.Text(right_frame, height=14)
+		self.prob_text.pack(fill=tk.BOTH, expand=True)
 
 	def choose_ckpt(self):
 		path = filedialog.askopenfilename(filetypes=[("PyTorch Checkpoint", "*.pth")])
