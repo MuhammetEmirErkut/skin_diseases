@@ -11,6 +11,25 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 
+# Hastalık isimlerinin Türkçe karşılıkları
+DISEASE_TRANSLATIONS = {
+	"Acne and Rosacea Photos": "Akne ve Rozasea",
+	"Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions": "Aktinik Keratoz ve Malign Lezyonlar",
+	"Atopic Dermatitis Photos": "Atopik Dermatit",
+	"Cellulitis Impetigo and other Bacterial Infections": "Bakteriyel Enfeksiyonlar",
+	"Eczema Photos": "Egzama",
+	"Herpes HPV and other STDs Photos": "Herpes HPV ve CYBH",
+	"Light Diseases and Disorders of Pigmentation": "Pigmentasyon Bozuklukları",
+	"Lupus and other Connective Tissue diseases": "Lupus ve Bağ Dokusu Hastalıkları",
+	"Poison Ivy Photos and other Contact Dermatitis": "Kontakt Dermatit",
+	"Psoriasis pictures Lichen Planus and related diseases": "Sedef Hastalığı",
+	"Seborrheic Keratoses and other Benign Tumors": "İyi Huylu Tümörler",
+	"Systemic Disease": "Sistemik Hastalık",
+	"Tinea Ringworm Candidiasis and other Fungal Infections": "Mantar Enfeksiyonları",
+	"Vascular Tumors": "Vasküler Tümörler",
+	"Warts Molluscum and other Viral Infections": "Viral Enfeksiyonlar"
+}
+
 
 def load_checkpoint(checkpoint_path: str):
 
@@ -63,8 +82,8 @@ class SkinGUI:
 
 	def __init__(self, root: tk.Tk) -> None:
 		self.root = root
-		self.root.title("Cilt Hastalığı Sınıflandırma")
-		self.root.geometry("900x600")
+		self.root.title("Cilt Hastalığı Sınıflandırma (15 Sınıf)")
+		self.root.geometry("1000x700")
 
 		self.model = None
 		self.preprocess = None
@@ -104,7 +123,7 @@ class SkinGUI:
 		self.pred_label = tk.Label(right_frame, textvariable=self.pred_label_var, font=("Arial", 14))
 		self.pred_label.pack(anchor=tk.W, pady=8)
 
-		self.prob_text = tk.Text(right_frame, height=14)
+		self.prob_text = tk.Text(right_frame, height=18)
 		self.prob_text.pack(fill=tk.BOTH, expand=True)
 
 	def choose_ckpt(self):
@@ -158,10 +177,12 @@ class SkinGUI:
 			return
 
 		pred, conf, probs = predict(self.model, self.preprocess, self.idx_to_class, pil_img, self.device)
-		self.pred_label_var.set(f"Tahmin: {pred} ({conf:.2%})")
+		pred_tr = DISEASE_TRANSLATIONS.get(pred, pred)
+		self.pred_label_var.set(f"Tahmin: {pred_tr} ({pred}) - {conf:.2%}")
 		self.prob_text.delete(1.0, tk.END)
 		for k, v in sorted(probs.items(), key=lambda x: x[1], reverse=True):
-			self.prob_text.insert(tk.END, f"{k}: {v:.4f}\n")
+			k_tr = DISEASE_TRANSLATIONS.get(k, k)
+			self.prob_text.insert(tk.END, f"{k_tr} ({k}): {v:.4f}\n")
 
 
 def main():

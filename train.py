@@ -262,9 +262,9 @@ def evaluate(model, loader, criterion, device) -> Tuple[float, float]:
 
 def main():
 
-	parser = argparse.ArgumentParser(description="Train skin disease classifier (10 classes)")
-	parser.add_argument("--data_dir", default="Project102/Dataset/train", type=str, help="Path to training folder (class subfolders)")
-	parser.add_argument("--test_dir", default="Project102/Dataset/test", type=str, help="Path to test folder for final evaluation")
+	parser = argparse.ArgumentParser(description="Train skin disease classifier (15 classes)")
+	parser.add_argument("--data_dir", default="Dataset/train", type=str, help="Path to training folder (class subfolders)")
+	parser.add_argument("--test_dir", default="Dataset/test", type=str, help="Path to test folder for final evaluation")
 	parser.add_argument("--csv", default=None, type=str, help="Path to CSV metadata (optional, overrides --data_dir)")
 	parser.add_argument("--files_root", default="files", type=str, help="Root folder for CSV-based images")
 	parser.add_argument("--epochs", default=30, type=int)

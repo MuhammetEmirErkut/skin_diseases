@@ -3,10 +3,15 @@
   "Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions": 1,
   "Atopic Dermatitis Photos": 2,
   "Cellulitis Impetigo and other Bacterial Infections": 3,
-  "Light Diseases and Disorders of Pigmentation": 4,
-  "Lupus and other Connective Tissue diseases": 5,
-  "Seborrheic Keratoses and other Benign Tumors": 6,
-  "Systemic Disease": 7,
-  "Tinea Ringworm Candidiasis and other Fungal Infections": 8,
-  "Warts Molluscum and other Viral Infections": 9
+  "Eczema Photos": 4,
+  "Herpes HPV and other STDs Photos": 5,
+  "Light Diseases and Disorders of Pigmentation": 6,
+  "Lupus and other Connective Tissue diseases": 7,
+  "Poison Ivy Photos and other Contact Dermatitis": 8,
+  "Psoriasis pictures Lichen Planus and related diseases": 9,
+  "Seborrheic Keratoses and other Benign Tumors": 10,
+  "Systemic Disease": 11,
+  "Tinea Ringworm Candidiasis and other Fungal Infections": 12,
+  "Vascular Tumors": 13,
+  "Warts Molluscum and other Viral Infections": 14
 }
